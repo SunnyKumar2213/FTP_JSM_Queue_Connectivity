@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:json="http://www.mulesoft.org/schema/mule/json"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<jms:config name="JMS_Config1" doc:name="JMS Config" doc:id="07d50e00-ead5-4a1e-bb88-0ac3128a34b5" >
+		<jms:active-mq-connection username="${activeMQ.client.username}" password="${activeMQ.client.password}">
+			<jms:factory-configuration brokerUrl="${activeMQ.client.url}"/>
+		</jms:active-mq-connection>
+	</jms:config>
+	<flow name="ftp_to_muletiple_systemFlow" doc:id="ce0be26f-aac2-4928-8589-dffb242218d2" >
+		<scheduler doc:name="Scheduler" doc:id="e08927c5-0c8a-4ff8-a468-7cfd91989b60" >
+			<scheduling-strategy >
+				<cron expression="${scheduler.cronExpression}" />
+			</scheduling-strategy>
+		</scheduler>
+		<logger level="INFO" doc:name="start of the ftp server" doc:id="3bab3427-0de5-40cf-8a5d-12eecfb7dc40" message="start of the ftp server" />
+		<ftp:list doc:name=" Fetch list of files " doc:id="a17273f9-b4d3-4cb5-8d2d-b09357389063" config-ref="FTP_Config" directoryPath="${ftp.filepath}" >
+			<ftp:matcher caseSensitive="false" filenamePattern="${ftp.filepattern}" />
+		</ftp:list>
+		<logger level="INFO" doc:name="Logger for check the schedular frequency" doc:id="1acf2841-8538-44ba-bd6d-c23654df42bd" message="#[now()]"/>
+		<ee:transform doc:name="filter the files in assending order using date" doc:id="ae165fb8-6a96-4fcb-84a2-76fe64685e8c" >
+			<ee:message >
+				<ee:set-payload resource="dwl/sortfilesByDate.dwl" />
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="filepath" ><![CDATA[%dw 2.0
+output application/json
+---
+payload.typedAttributes.path]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<foreach doc:name="For Each" doc:id="6046b9c3-6f24-4f47-a7fa-e797c3827979" >
+			<logger level="DEBUG" doc:name="start of foreach " doc:id="503b839e-7e81-4e7d-ba72-de87730072eb" message='"start of foreach #[payload]"' />
+			<ftp:read doc:name="Read the single file each time" doc:id="c2e492e5-e253-4c22-a706-61893305a0fd" config-ref="FTP_Config" path="#[payload]" target="fileOutput" />
+			<try doc:name="Try" doc:id="dba4ff1f-bd36-4e66-ae2c-121b371b0883" >
+				<ee:transform doc:name="convert XML to JSON" doc:id="18d3523d-a7f1-4e63-a147-6ca39dbbfe89" >
+					<ee:message />
+					<ee:variables >
+						<ee:set-variable variableName="jsonOutput" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.fileOutput]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<json:validate-schema doc:name="Validate the JSON schema" doc:id="d9ebb3a4-5cca-46c7-8f63-bdd65ae50e49" schema="jsonSchemas/projectInputSchema.json" >
+					<error-mapping sourceType="JSON:INVALID_SCHEMA" targetType="APP:INVALID_SCHEMA" />
+					<json:content ><![CDATA[#[vars.jsonOutput]]]></json:content>
+				</json:validate-schema>
+				<logger level="INFO" doc:name="publish to JSM Queue" doc:id="68018e76-1b28-4a4c-91a4-547a29d8d357" message='"publish to JSM Queue"' />
+				<jms:publish doc:name="Publish TO ActiveMQ queue" doc:id="8bf187a7-a176-4ed1-a0dc-729f3af5a5c6" destination="${activeMQ.client.queueName}" persistentDelivery="true" config-ref="JMS_Config" sendCorrelationId="AUTO">
+					<jms:message>
+						<jms:body ><![CDATA[#[vars.jsonOutput]]]></jms:body>
+					</jms:message>
+				</jms:publish>
+<logger level="DEBUG" doc:name="Logger after publish into queue" doc:id="0dfc511e-6a90-4386-8db3-fc7aaba4b988" message="#[payload]"/>
+								<ftp:delete doc:name="Delete the file from processing folder" doc:id="98bfbf28-9998-4e7b-9965-a6c6cd704747" config-ref="FTP_Config" path="#[payload]" />
+				<logger level="INFO" doc:name="After deleteting the file" doc:id="f1259109-b726-495d-ad1b-20a41f326477" message='"After deleteting the file"' />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="8316d965-397d-4fff-b747-67416dfa9f9d" type="JSON:SCHEMA_NOT_HONOURED, EXPRESSION" >
+						<logger level="ERROR" doc:name="bad files foundlogger" doc:id="7217f0d6-7b32-4ada-8cc8-3d7c767f2575" message='"Bad file found"' />
+						<ftp:move doc:name="Move the file in bad_files folder" doc:id="8c5ee6c2-3ac0-48ac-ad1f-8be3621dc752" config-ref="FTP_Config" sourcePath="#[payload]" targetPath="${badfilespath}" />
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</foreach>
+		<logger level="INFO" doc:name="end of the flow" doc:id="0f7e4aa9-cfd1-4d28-b481-222e64d3cefc" message="#[payload]" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="8ce3f218-5b93-4120-af75-02ff38c5190c" type="FTP:CONNECTIVITY" >
+				<logger level="ERROR" doc:name="FTP connectivity error" doc:id="c08927c9-96b6-41be-9756-6369025dbf0b" message='#["FTP connectivity error"]' />
+				<ee:transform doc:name="FTP connectivity error message" doc:id="d78d21a7-61d0-448e-8f3d-9619b135ff3f" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message:"FTP connectivity error"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate1" doc:id="5081881c-486c-4e75-a14e-ccd7b207d107" type="FTP:ACCESS_DENIED" >
+				<logger level="ERROR" doc:name="Error during reading the file" doc:id="fac48bef-79fc-4d19-9a73-54bc063bf6e7" message='#["Error during reading the file"]' />
+				<ee:transform doc:name="Error during reading the file1" doc:id="b1359867-beca-419f-8e65-6e54ae97c5a2" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message:"Error during reading the file"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate2" doc:id="ebe10a27-7613-4c49-baa4-53e5b469aef4" type="JMS:DESTINATION_NOT_FOUND, JMS:ILLEGAL_BODY, JMS:PUBLISHING, JMS:RETRY_EXHAUSTED, JMS:SECURITY" >
+				<logger level="ERROR" doc:name="JSM error" doc:id="1851c0a9-d25c-484c-b14d-502a19a05866" message='"JSM error"' />
+				<ee:transform doc:name="JSM error found" doc:id="087dc55f-9218-4c2d-a883-84d78f62bae8" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message:"JSM error found"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projects>
+   <project>
+<wbs>
+         <FileName>WBSExport_20220510_15424.txt</FileName>
+         <CostObjectHierarchyLevel>2</CostObjectHierarchyLevel>
+         <ASInterface>true</ASInterface>
+         <SalesForceInterface>false</SalesForceInterface>
+         <SAPInterFace>false</SAPInterFace>
+         <OMSInterface>false</OMSInterface>
+         <ProjectID>PROJECT-K103244</ProjectID>
+         <ProjectTitle>OMS PROJECT #1 - CPG</ProjectTitle>
+         <TotalInvestmentAmount>10000</TotalInvestmentAmount>
+         <ExpensePlannedTotalInstalledCost>10000</ExpensePlannedTotalInstalledCost>
+         <CapitalPlannedTotalInstalledCost>0</CapitalPlannedTotalInstalledCost>
+         <WorkingCapital>0</WorkingCapital>
+         <HierarchyPathID>PROJECT-K103244.01.00</HierarchyPathID>
+         <CostObjectName>PDRI Category</CostObjectName>
+         <SAPP3PlannedCosts>0</SAPP3PlannedCosts>
+         <SAPP1PlannedCosts>0</SAPP1PlannedCosts>
+         <SAPSettlementRule1>0</SAPSettlementRule1>
+         <ProjectWBSInterfaceFilterHOURLYCO>Y</ProjectWBSInterfaceFilterHOURLYCO>
+         <ProjectWBSInterfaceHRAPIEXPTEXT>2020-07-10 11:00:00</ProjectWBSInterfaceHRAPIEXPTEXT>
+         <LastUpdateDate>2020-06-30T10:31:15.887-04</LastUpdateDate>
+         <OriginalBudget>10000</OriginalBudget>
+         <CurrentBudget>10000</CurrentBudget>
+         <Default>0</Default>
+         <Materials>0</Materials>
+         <Construction>0</Construction>
+         <Engineering>0</Engineering>
+         <Cost>10000</Cost>
+         <StartUp>0</StartUp>
+         <Equipment>0</Equipment>
+      </wbs>      
+</project>
+   </projects>

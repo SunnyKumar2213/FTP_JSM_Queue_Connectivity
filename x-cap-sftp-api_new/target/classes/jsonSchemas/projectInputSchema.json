@@ -1,0 +1,136 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "projects": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "object",
+          "properties": {
+            "wbs": {
+              "type": "object",
+              "properties": {
+                "FileName": {
+                  "type": "string"
+                },
+                "CostObjectHierarchyLevel": {
+                  "type": "string"
+                },
+                "ASInterface": {
+                  "type": "string"
+                },
+                "SalesForceInterface": {
+                  "type": "string"
+                },
+                "SAPInterFace": {
+                  "type": "string"
+                },
+                "OMSInterface": {
+                  "type": "string"
+                },
+                "ProjectID": {
+                  "type": "string"
+                },
+                "ProjectTitle": {
+                  "type": "string"
+                },
+                "TotalInvestmentAmount": {
+                  "type": "string"
+                },
+                "ExpensePlannedTotalInstalledCost": {
+                  "type": "string"
+                },
+                "CapitalPlannedTotalInstalledCost": {
+                  "type": "string"
+                },
+                "WorkingCapital": {
+                  "type": "string"
+                },
+                "HierarchyPathID": {
+                  "type": "string"
+                },
+                "CostObjectName": {
+                  "type": "string"
+                },
+                "SAPP3PlannedCosts": {
+                  "type": "string"
+                },
+                "SAPP1PlannedCosts": {
+                  "type": "string"
+                },
+                "SAPSettlementRule1": {
+                  "type": "string"
+                },
+                "ProjectWBSInterfaceFilterHOURLYCO": {
+                  "type": "string"
+                },
+                "ProjectWBSInterfaceHRAPIEXPTEXT": {
+                  "type": "string"
+                },
+                "OriginalBudget": {
+                  "type": "string"
+                },
+                "CurrentBudget": {
+                  "type": "string"
+                },
+                "Default": {
+                  "type": "string"
+                },
+                "Construction": {
+                  "type": "string"
+                },
+                "Engineering": {
+                  "type": "string"
+                },
+                "StartUp": {
+                  "type": "string"
+                },
+                "Equipment": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "FileName",
+                "CostObjectHierarchyLevel",
+                "ASInterface",
+                "SalesForceInterface",
+                "SAPInterFace",
+                "OMSInterface",
+                "ProjectID",
+                "ProjectTitle",
+                "TotalInvestmentAmount",
+                "ExpensePlannedTotalInstalledCost",
+                "CapitalPlannedTotalInstalledCost",
+                "WorkingCapital",
+                "HierarchyPathID",
+                "CostObjectName",
+                "SAPP3PlannedCosts",
+                "SAPP1PlannedCosts",
+                "SAPSettlementRule1",
+                "ProjectWBSInterfaceFilterHOURLYCO",
+                "ProjectWBSInterfaceHRAPIEXPTEXT",
+                "OriginalBudget",
+                "CurrentBudget",
+                "Default",
+                "Construction",
+                "Engineering",
+                "StartUp",
+                "Equipment"
+              ]
+            }
+          },
+          "required": [
+            "wbs"
+          ]
+        }
+      },
+      "required": [
+        "project"
+      ]
+    }
+  },
+  "required": [
+    "projects"
+  ]
+}

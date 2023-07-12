@@ -1,0 +1,27 @@
+[
+{
+  
+    "typedAttributes": {
+      "symbolicLink": false,
+      "regularFile": true,
+      "directory": false,
+      "path": "/ftpuser/processing/wbs_2023-05-03_13:00:00.039.xml",
+      "size": 1649,
+      "name": "wbs_2023-05-03_13:00:00.039.xml",
+      "timestamp": "|2023-05-04T13:54:22|"
+    }
+  },
+  {
+    "typedAttributes": {
+      "symbolicLink": false,
+      "regularFile": true,
+      "directory": false,
+      "path": "/ftpuser/processing/wbs_2023-05-03_13:30:00.039.xml",
+      "size": 1649,
+      "name": "wbs_2023-05-03_13:00:00.039.xml",
+      "timestamp": "|2023-05-04T13:54:22|"
+    }
+  }
+ 
+]
+ 

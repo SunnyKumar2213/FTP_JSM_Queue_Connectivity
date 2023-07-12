@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+	<ftp:config name="FTP_Config" doc:name="FTP Config" doc:id="e85567f7-040e-4fb2-9e30-70c738ba425e" >
+		<ftp:connection host="${ftp.host}" username="${ftp.user}" password="${ftp.password}" />
+	</ftp:config>
+	<jms:config name="JMS_Config" doc:name="JMS Config" doc:id="d9cdd64f-cdaa-4c62-941b-2bfd81854800" >
+		<jms:active-mq-connection username="${activeMQ.client.username}" password="${activeMQ.client.password}" >
+			<jms:factory-configuration brokerUrl="${activeMQ.client.url}" />
+		</jms:active-mq-connection>
+	</jms:config>
+	<global-property doc:name="Global Property" doc:id="9e18a570-5781-462e-b51a-51aa1e83c2d9" name="env" value="local" />
+	<configuration-properties doc:name="Configuration properties" doc:id="09b3e253-9044-4f6a-a7a0-22ae65be72b1" file="properties/${env}.properties" />
+</mule>

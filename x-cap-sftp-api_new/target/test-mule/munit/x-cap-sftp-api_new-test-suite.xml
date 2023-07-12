@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="x-cap-sftp-api_new-test-suite.xml" />
+	<munit:test name="postive-x-cap-sftp-api-suite-systemFlowTest" doc:id="bb9caf7e-36fe-44ff-be8e-3f845536a350" description="Test" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when getting  list of files" doc:id="5a3b9f43-51c0-48ae-8144-3d9af7f409c3" processor="ftp:list" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="a17273f9-b4d3-4cb5-8d2d-b09357389063" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://mock_files/file_list_input.json')]" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock the reading the file" doc:id="4bb7ea79-020d-4bcf-b5bc-45ba35f4b506" processor="ftp:read" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Read the single file each time" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<set-variable value="#[output application/xml --- readUrl('classpath://mock_files/ftp_mock_read_xml.xml','application/xml')]" doc:name="set fileOutput" doc:id="724471f6-dc4f-47f0-9ad6-6ce3fa406a8b" variableName="fileOutput" />
+			<munit-tools:mock-when doc:name="Mock when publishing in to queue" doc:id="c6a69c5d-104a-45cc-9980-69479512f002" processor="jms:publish" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Publish TO ActiveMQ queue" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when delete the file from processing" doc:id="7cb19a68-628c-4ae2-af54-0521e560c413" processor="ftp:delete" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Delete the file from processing folder" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="postive_x-cap-sftp-api" doc:id="a74dfac7-44aa-4416-892a-833565957fc7" name="ftp_to_muletiple_systemFlow" />
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert expression equal to payload" doc:id="b98cb8f7-23bf-4ee6-b65c-ed6405636e08" >
+				<munit-tools:that ><![CDATA[#[import * from dw::test::Asserts 
+ ---
+vars.fileOutput must equalTo({
+  "projects": {
+    "project": {
+      "wbs": {
+        "FileName": "WBSExport_20220510_15424.txt",
+        "CostObjectHierarchyLevel": "2",
+        "ASInterface": "true",
+        "SalesForceInterface": "false",
+        "SAPInterFace": "false",
+        "OMSInterface": "false",
+        "ProjectID": "PROJECT-K103244",
+        "ProjectTitle": "OMS PROJECT #1 - CPG",
+        "TotalInvestmentAmount": "10000",
+        "ExpensePlannedTotalInstalledCost": "10000",
+        "CapitalPlannedTotalInstalledCost": "0",
+        "WorkingCapital": "0",
+        "HierarchyPathID": "PROJECT-K103244.01.00",
+        "CostObjectName": "PDRI Category",
+        "SAPP3PlannedCosts": "0",
+        "SAPP1PlannedCosts": "0",
+        "SAPSettlementRule1": "0",
+        "ProjectWBSInterfaceFilterHOURLYCO": "Y",
+        "ProjectWBSInterfaceHRAPIEXPTEXT": "2020-07-10 11:00:00",
+        "LastUpdateDate": "2020-06-30T10:31:15.887-04",
+        "OriginalBudget": "10000",
+        "CurrentBudget": "10000",
+        "Default": "0",
+        "Materials": "0",
+        "Construction": "0",
+        "Engineering": "0",
+        "Cost": "10000",
+        "StartUp": "0",
+        "Equipment": "0"
+      }
+    }
+  }
+})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="negative_x-cap-sftp-api_move_to_bad_files" doc:id="33df933d-137a-427b-9f4c-bf3dea251829" description="Test" expectedErrorType="JSON:SCHEMA_NOT_HONOURED" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when list of files" doc:id="34a5100e-c85a-4a04-86b5-06bde5c1dcf0" processor="ftp:list">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="a17273f9-b4d3-4cb5-8d2d-b09357389063" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://mock_files/file_list_input.json')]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock the reading the file" doc:id="ccd7c14e-9fa4-4570-9f0c-970e878155e6" processor="ftp:read" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="c2e492e5-e253-4c22-a706-61893305a0fd" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<set-variable value="#[output application/xml --- readUrl('classpath://mock_files/ftp_read_bad_file.xml','application/xml')]" doc:name="set fileOutput with missing some schema" doc:id="45bf6aa1-4572-4606-8052-f8c1e2dc1185" variableName="fileOutput" />
+			<munit-tools:mock-when doc:name="Mock when transfer bad files into badFiles folder" doc:id="794164b0-ce31-4b2b-aad5-b16b6f100c1d" processor="ftp:move" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="8c5ee6c2-3ac0-48ac-ad1f-8be3621dc752" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="JSON:SCHEMA_NOT_HONOURED" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="negative_x-cap-sftp-api_Flow" doc:id="c3686585-aa5d-49cb-99c8-645f38bc9e3c" name="ftp_to_muletiple_systemFlow" />
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert expression equal to missing payload output " doc:id="a7614ee3-d0d3-4062-83b5-d9949dbc493d" >
+				<munit-tools:that ><![CDATA[#[import * from dw::test::Asserts 
+ ---
+vars.fileOutput must equalTo(
+{
+  "projects": {
+    "project": {
+      "wbs": {
+        "FileName": "WBSExport_20220510_15424.txt",
+        "CostObjectHierarchyLevel": "2",
+        "ASInterface": "true",
+        "SalesForceInterface": "false",
+        "SAPInterFace": "false",
+        "ProjectWBSInterfaceFilterHOURLYCO": "Y",
+        "ProjectWBSInterfaceHRAPIEXPTEXT": "2020-07-10 11:00:00",
+        "LastUpdateDate": "2020-06-30T10:31:15.887-04",
+        "OriginalBudget": "10000",
+        "CurrentBudget": "10000",
+        "Default": "0",
+        "Materials": "0",
+        "Construction": "0",
+        "Engineering": "0",
+        "Cost": "10000",
+        "StartUp": "0",
+        "Equipment": "0"
+      }
+    }
+  }
+}  
+)]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="negative_x_cap_api_ftp_connectivity" doc:id="032bc5fd-9e98-46c0-9906-ee677dfb8295" description="Test" expectedErrorType="FTP:CONNECTIVITY" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when getting  list of files" doc:id="07fab5b9-9947-43e2-92e5-3db9fb2122b9" processor="ftp:list" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="a17273f9-b4d3-4cb5-8d2d-b09357389063" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="FTP:CONNECTIVITY" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="negative_x-cap-sftp-api_Flow" doc:id="f6b11a2f-3fb7-4cdb-b6d1-2843c6717a5c" name="ftp_to_muletiple_systemFlow" />
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert equals to error on fetching files from FTP" doc:id="75361fe8-2ad0-4e96-8d20-54110f734c60" actual="#[payload.message]" expected='#["FTP connectivity error"]' />
+		</munit:validation>
+	</munit:test>
+
+</mule>

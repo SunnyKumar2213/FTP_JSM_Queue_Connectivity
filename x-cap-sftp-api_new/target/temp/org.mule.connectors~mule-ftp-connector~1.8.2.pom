@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <parent>
+        <groupId>org.mule.extensions</groupId>
+        <artifactId>mule-core-modules-parent</artifactId>
+        <version>1.1.9</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.mule.connectors</groupId>
+    <artifactId>mule-ftp-connector</artifactId>
+    <packaging>mule-extension</packaging>
+    <version>1.8.2</version>
+
+    <name>FTP Connector</name>
+    <description>A Mule connector that provides functionality to manage files in an FTP server</description>
+
+    <properties>
+        <mule.version>4.1.2</mule.version>
+
+        <commonsNetVersion>3.6</commonsNetVersion>
+        <commonsIoVersion>2.11.0</commonsIoVersion>
+        <commonsLangVersion>3.12.0</commonsLangVersion>
+        <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
+        <maven.helper.plugin.version>3.3.0</maven.helper.plugin.version>
+
+        <muleFileCommonsVersion>1.4.1</muleFileCommonsVersion>
+        <muleTestsComponentPlugin>${mule.version}</muleTestsComponentPlugin>
+        <muleTestsRunnerVersion>4.1.5</muleTestsRunnerVersion>
+        <muleSdkApiVersion>0.3.0</muleSdkApiVersion>
+        <!-- Remove when a new parent version with MTF is available -->
+        <munit.input.directory>src/test/munit</munit.input.directory>
+        <munit.output.directory>${basedir}/target/test-mule/munit</munit.output.directory>
+
+        <munit.extensions.maven.plugin.version>1.1.2</munit.extensions.maven.plugin.version>
+        <munit.version>2.3.12</munit.version>
+        <mtf.tools.version>1.1.2</mtf.tools.version>
+        <mavenResources.version>3.3.0</mavenResources.version>
+
+        <formatterConfigPath>formatter.xml</formatterConfigPath>
+        <docker.maven.plugin.version>0.40.2</docker.maven.plugin.version>
+        <java.module.version>1.2.10</java.module.version>
+        <file.connector.version>1.5.0</file.connector.version>
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-file-extension-common</artifactId>
+            <version>${muleFileCommonsVersion}</version>
+            <classifier>mule-plugin</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.sdk</groupId>
+            <artifactId>mule-sdk-api</artifactId>
+            <version>${muleSdkApiVersion}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+            <version>${commonsNetVersion}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commonsIoVersion}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commonsLangVersion}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>${commonsCollectionsVersion}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-runner</artifactId>
+            <version>${muleTestsRunnerVersion}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-file-extension-common</artifactId>
+            <version>${muleFileCommonsVersion}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-infrastructure</artifactId>
+            <version>${mule.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.tests.plugin</groupId>
+            <artifactId>mule-tests-component-plugin</artifactId>
+            <version>${muleTestsComponentPlugin}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.module</groupId>
+            <artifactId>mule-java-module</artifactId>
+            <version>${java.module.version}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.connectors</groupId>
+            <artifactId>mule-file-connector</artifactId>
+            <version>${file.connector.version}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${mavenResources.version}</version>
+                <executions>
+                    <execution>
+                        <id>copy-munit-resources</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${munit.output.directory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${munit.input.directory}</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.mulesoft.munit</groupId>
+                <artifactId>munit-extensions-maven-plugin</artifactId>
+                <version>${munit.extensions.maven.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <phase>integration-test</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <runtimeConfiguration>
+                        <discoverRuntimes>
+                            <product>ALL</product>
+                            <includeSnapshots>true</includeSnapshots>
+                        </discoverRuntimes>
+                    </runtimeConfiguration>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.mulesoft.munit</groupId>
+                        <artifactId>munit-runner</artifactId>
+                        <version>${munit.version}</version>
+                        <classifier>mule-plugin</classifier>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.mulesoft.munit</groupId>
+                        <artifactId>munit-tools</artifactId>
+                        <version>${munit.version}</version>
+                        <classifier>mule-plugin</classifier>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.mulesoft.munit</groupId>
+                        <artifactId>mtf-tools</artifactId>
+                        <version>${mtf.tools.version}</version>
+                        <classifier>mule-plugin</classifier>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${maven.helper.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>reserve-network-port</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>reserve-network-port</goal>
+                        </goals>
+                        <configuration>
+                            <portNames>
+                                <portName>ftp.listener.port</portName>
+                                <portName>ftp.passivePort1</portName>
+                                <portName>ftp.passivePort2</portName>
+                                <portName>ftp.passivePort3</portName>
+                                <portName>ftp.passivePort4</portName>
+                                <portName>ftp.passivePort5</portName>
+                                <portName>ftp.passivePort6</portName>
+                                <portName>ftp.passivePort7</portName>
+                                <portName>ftp.passivePort8</portName>
+                                <portName>ftp.passivePort9</portName>
+                                <portName>ftp.passivePort10</portName>
+                                <portName>squid.port.http</portName>
+                                <portName>squid.port.https</portName>
+                                <portName>squid.port.auth</portName>
+                                <portName>ftp.proxy</portName>
+                                <portName>ftp.proxy.auth</portName>
+                            </portNames>
+                            <minPortNumber>9000</minPortNumber>
+                            <maxPortNumber>10000</maxPortNumber>
+                            <randomPort>false</randomPort>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <id>vsftp-ftp</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>${docker.maven.plugin.version}</version>
+                        <configuration>
+                            <images>
+                                <image>
+                                    <name>mule/vsftpd-ftp</name>
+                                    <build>
+                                        <contextDir>${project.basedir}/src/test/resources/docker</contextDir>
+                                    </build>
+                                    <run>
+                                        <ports>
+                                            <!--ftp command port-->
+                                            <port>${ftp.listener.port}:21</port>
+                                            <!--ftp data ports-->
+                                            <port>${ftp.passivePort1}:${ftp.passivePort1}</port>
+                                            <port>${ftp.passivePort2}:${ftp.passivePort2}</port>
+                                            <port>${ftp.passivePort3}:${ftp.passivePort3}</port>
+                                            <port>${ftp.passivePort4}:${ftp.passivePort4}</port>
+                                            <port>${ftp.passivePort5}:${ftp.passivePort5}</port>
+                                            <port>${ftp.passivePort6}:${ftp.passivePort6}</port>
+                                            <port>${ftp.passivePort7}:${ftp.passivePort7}</port>
+                                            <port>${ftp.passivePort8}:${ftp.passivePort8}</port>
+                                            <port>${ftp.passivePort9}:${ftp.passivePort9}</port>
+                                            <port>${ftp.passivePort10}:${ftp.passivePort10}</port>
+                                        </ports>
+                                        <env>
+                                            <FTP_USER>bob</FTP_USER>
+                                            <FTP_PASS>1234</FTP_PASS>
+                                            <PASV_ADDRESS>127.0.0.1</PASV_ADDRESS>
+                                            <PASV_MIN_PORT>${ftp.passivePort1}</PASV_MIN_PORT>
+                                            <PASV_MAX_PORT>${ftp.passivePort10}</PASV_MAX_PORT>
+                                        </env>
+                                        <log>
+                                            <enabled>true</enabled>
+                                        </log>
+                                    </run>
+                                </image>
+                            </images>
+                            <verbose>true</verbose>
+                        </configuration>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.slf4j</groupId>
+                                <artifactId>slf4j-api</artifactId>
+                                <version>1.7.36</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>org.slf4j</groupId>
+                                <artifactId>jcl-over-slf4j</artifactId>
+                                <version>1.7.36</version>
+                            </dependency>
+                        </dependencies>
+                        <executions>
+                            <execution>
+                                <id>start</id>
+                                <phase>test-compile</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                    <goal>start</goal>
+                                </goals>
+                                <configuration>
+                                    <showLogs>true</showLogs>
+                                    <logStdout>true</logStdout>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>stop</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>stop</goal>
+                                    <goal>remove</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>com.dkanejs.maven.plugins</groupId>
+                        <artifactId>docker-compose-maven-plugin</artifactId>
+                        <version>4.0.0</version>
+                        <configuration>
+                            <composeFiles>
+                                <composeFile>${project.basedir}/src/test/resources/dockercompose/docker-compose-auth.yml</composeFile>
+                                <composeFile>${project.basedir}/src/test/resources/dockercompose/docker-compose.yml</composeFile>
+
+                            </composeFiles>
+                            <envVars>
+                                <squidPort>${squid.port.http}</squidPort>
+                                <squidPortHttps>${squid.port.https}</squidPortHttps>
+                                <squidPortAuth>${squid.port.auth}</squidPortAuth>
+                                <ftpProxy>${ftp.proxy}</ftpProxy>
+                                <ftpProxyAuth>${ftp.proxy.auth}</ftpProxyAuth>
+                            </envVars>
+                            <detachedMode>true</detachedMode>
+                            <skip>${docker.skip}</skip>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>docker-compose-up</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>up</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>docker-compose-down</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>down</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+
+
+    <distributionManagement>
+        <repository>
+            <id>mule-releases</id>
+            <name>Mule Release Repository</name>
+            <url>https://repository-master.mulesoft.org/nexus/content/repositories/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>mule-snapshots</id>
+            <name>Mule Snapshot Repository</name>
+            <url>https://repository-master.mulesoft.org/nexus/content/repositories/snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>mule</id>
+            <name>Mule Repository</name>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>mule-plugin</id>
+            <name>Mule Repository</name>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
+        </pluginRepository>
+    </pluginRepositories>
+</project>

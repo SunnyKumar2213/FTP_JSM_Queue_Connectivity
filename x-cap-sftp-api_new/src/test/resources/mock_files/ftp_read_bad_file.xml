@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projects>
+   <project>
+<wbs>
+         <FileName>WBSExport_20220510_15424.txt</FileName>
+         <CostObjectHierarchyLevel>2</CostObjectHierarchyLevel>
+         <ASInterface>true</ASInterface>
+         <SalesForceInterface>false</SalesForceInterface>
+         <SAPInterFace>false</SAPInterFace>
+         <ProjectWBSInterfaceFilterHOURLYCO>Y</ProjectWBSInterfaceFilterHOURLYCO>
+         <ProjectWBSInterfaceHRAPIEXPTEXT>2020-07-10 11:00:00</ProjectWBSInterfaceHRAPIEXPTEXT>
+         <LastUpdateDate>2020-06-30T10:31:15.887-04</LastUpdateDate>
+         <OriginalBudget>10000</OriginalBudget>
+         <CurrentBudget>10000</CurrentBudget>
+         <Default>0</Default>
+         <Materials>0</Materials>
+         <Construction>0</Construction>
+         <Engineering>0</Engineering>
+         <Cost>10000</Cost>
+         <StartUp>0</StartUp>
+         <Equipment>0</Equipment>
+      </wbs>      
+</project>
+   </projects>
